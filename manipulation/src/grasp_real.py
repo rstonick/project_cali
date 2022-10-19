@@ -20,12 +20,23 @@ class Pick_Place_EE_Pose():
 
     def __init__(self):
 
+         ## First initialize `moveit_commander`_ and a `rospy`_ node:
         moveit_commander.roscpp_initialize(sys.argv)
 
+        ## Instantiate a `RobotCommander`_ object. This object is the outer-level interface to
+        ## the robot:
         self.robot = moveit_commander.RobotCommander()
+
+        ## Instantiate a `PlanningSceneInterface`_ object.  This object is an interface
+        ## to the world surrounding the robot:
         self.scene = moveit_commander.PlanningSceneInterface()
+
+        ## Instantiate a `MoveGroupCommander`_ object.  This object is an interface
+        ## to one group of joints. 
         self.group_arm = moveit_commander.MoveGroupCommander("arm")
         self.group_gripper = moveit_commander.MoveGroupCommander("gripper")
+
+        
 
         self.sub = rospy.Subscriber(
             '/graspable_object_pose', Pose, self.pose_callback)
