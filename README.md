@@ -42,7 +42,7 @@ Open up a terminal on your linux machine and execute following:
 ```bash
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src
-git clone https://github.com/CSULA-URC/2021-22.git 
+git clone https://github.com/jkoubs/project_cali.git 
 cd ~/catkin_ws/
 catkin_make
 source devel/setup.bash
