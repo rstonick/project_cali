@@ -2,7 +2,7 @@
 
   
     <node pkg ="manipulation"
-        type="release_real.py"
+        type="release.py"
         name="release_coke_to_trash"
         output="screen">
     </node>

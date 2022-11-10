@@ -14,6 +14,8 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Twist
+
 
 
 class Pick_Place_EE_Pose():
@@ -37,6 +39,8 @@ class Pick_Place_EE_Pose():
         self.group_gripper = moveit_commander.MoveGroupCommander("gripper")
 
         
+        self.rb1_vel_publisher = rospy.Publisher(
+            '/cmd_vel', Twist, queue_size=1)
 
         self.sub = rospy.Subscriber(
             '/graspable_object_pose', Pose, self.pose_callback)
@@ -45,11 +49,29 @@ class Pick_Place_EE_Pose():
         self.group_variable_values_arm_goal = self.group_arm.get_current_joint_values()
         self.group_variable_values_gripper_close = self.group_gripper.get_current_joint_values()
         self.pose_target = Pose()
+        self.reach = Pose()
         self.rate = rospy.Rate(10)
 
-        self.offset_x = -0.005
+        self.offset_x = -0.04
         self.offset_y = 0.015
         self.offset_z = 0.033
+        self.ctrl_c = False
+        self.cmd = Twist()
+
+    def publish_once_in_cmd_vel(self):
+        """
+        This is because publishing in topics sometimes fails the first time you publish.
+        In continuous publishing systems, this is no big deal, but in systems that publish only
+        once, it IS very important.
+        """
+        while not self.ctrl_c:
+            connections = self.rb1_vel_publisher.get_num_connections()
+            if connections > 0:
+                self.rb1_vel_publisher.publish(self.cmd)
+                rospy.loginfo("Cmd Published")
+                break
+            else:
+                self.rate.sleep()
 
     def pose_callback(self, msg):
         # This is the pose given from the camera 
@@ -58,6 +80,25 @@ class Pick_Place_EE_Pose():
         self.pose_y_from_cam = msg.position.y
         self.pose_z_from_cam = msg.position.z
 
+    def move_forward(self):
+        rospy.loginfo("Moving forward !")
+        self.cmd.linear.x = 0.01
+        self.cmd.angular.z = 0.0
+        self.publish_once_in_cmd_vel()
+
+    def stop(self):
+        rospy.loginfo('Stop the robot !')
+        self.cmd.linear.x = 0.0
+        self.cmd.angular.z = 0.0
+        self.publish_once_in_cmd_vel()
+
+    def check_reach(self):
+        self.reach.position.x = self.pose_x_from_cam
+        while self.reach.position.x > 0.69:
+            print(self.reach.position.x)
+            self.move_forward()
+            self.rate.sleep()
+        self.stop()
 
     def get_data(self):
 
@@ -98,49 +139,23 @@ class Pick_Place_EE_Pose():
         rospy.sleep(2)
 
     def pregrasp(self):
-        # Step2: Pregrasp [ARM GROUP]
-        
-        # This works with tolerances: 0.05, 0.01 and 0.01
-        # self.pose_target.position.x = 0.702
-        # self.pose_target.position.y = 0.039
-        # self.pose_target.position.z = 0.821
-        # self.pose_target.orientation.x = -0.002
-        # self.pose_target.orientation.y = 0.04
-        # self.pose_target.orientation.z = 0.045
-        # self.pose_target.orientation.w = 0.998
-
+        self.move_forward()
+        while not self.pose_x_from_cam < 0.71:
+            rospy.loginfo("<<<<<<<<<<<<<<<<<  OPTIMIZATION STEP : Slowly approaching the coke can  >>>>>>>>>>>>>>>>>>>>")
+            rospy.loginfo("The distance to the coke can is: %f",self.pose_x_from_cam)
+            self.rate.sleep()
+        self.stop()
+        print('reach =')
+        print(self.pose_x_from_cam)
 
         self.pose_target.position.x = self.pose_x_from_cam + self.offset_x
         self.pose_target.position.y = self.pose_y_from_cam + self.offset_y
         self.pose_target.position.z = self.pose_z_from_cam + self.offset_z
 
-        # self.pose_target.orientation.x = 0.015
-        # self.pose_target.orientation.y = 0.068
-        # self.pose_target.orientation.z = 0.092
-        # self.pose_target.orientation.w = 0.993
-
-        # self.pose_target.orientation.x = 0.007
-        # self.pose_target.orientation.y = 0.036
-        # self.pose_target.orientation.z = 0.046
-        # self.pose_target.orientation.w = 0.998
-
         self.pose_target.orientation.x = 0.0
         self.pose_target.orientation.y = 0.0
         self.pose_target.orientation.z = 0.0
         self.pose_target.orientation.w = 1
-
-        # orientation_1(parallel, long reach): -0.006, 0.081, 0.070, 0.994
-        # orientation_2(higher pitch): -0.010, 0.149, 0.069, 0.986
-        # orientation_3(higher pitch again): -0.012, 0.171, 0.069, 0.983
-        # orientation_4(highest pitch): -0.018, 0.260, 0.068, 0.963
-
-        # orientation_5(pick from top): -0.042, 0.673, 0.046, 0.737
-
-
-       
-
-        # note: second angle value that is most VOLATILE tweak this value
-
 
         # Print our goal pose
         rospy.logerr("LETS PRINT OUR GOAL POSE FROM THE robot_footprint FRAME:")
@@ -208,6 +223,16 @@ class Pick_Place_EE_Pose():
         
         rospy.loginfo('Getting Data..')
         pick_place_object.get_data()
+
+        # rospy.loginfo('Now check if robot can reach the graspable object............')
+        # pick_place_object.check_reach()
+
+        # while self.pose_x_from_cam > 0.69:
+        #     print(self.pose_x_from_cam)
+        #     pick_place_object.move_forward()
+        #     self.rate.sleep()
+        # pick_place_object.stop()
+
         rospy.loginfo('Opening Gripper..')
         pick_place_object.open_gripper()
         rospy.loginfo('Pregrasp..')
@@ -217,14 +242,12 @@ class Pick_Place_EE_Pose():
         rospy.loginfo('Retreating..')
         pick_place_object.retreat()
         
-
         rospy.loginfo('Shuting Down ..')
         moveit_commander.roscpp_shutdown()
     
 
-
 if __name__ == '__main__':
-    rospy.init_node('grasp_can', anonymous=True)
+    rospy.init_node('grasp_coke_can', anonymous=True)
     pick_place_object = Pick_Place_EE_Pose()
     try:
         pick_place_object.main()

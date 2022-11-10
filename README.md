@@ -334,10 +334,10 @@ Launch Navigation <strong>Service Server</strong> where we can choose among diff
 ```bash
 roslaunch rover_autonav navigation_srv_server.launch
 ```
-Call the <strong>Service</strong> to go to the <strong>grasp_position</strong> pose (<em>shell#4</em>):
+Call the <strong>Service</strong> to go to the <strong>approach</strong> pose (<em>shell#4</em>):
 
 ```bash
-rosservice call /go_to_point "label: 'grasp_position'"
+rosservice call /go_to_point "label: 'approach'"
 ```
 
 Once arrived to the <strong>grasp_position</strong>, launch <strong>Moveit</strong> (<em>shell#4</em>):
@@ -367,7 +367,7 @@ roslaunch perception pub_object_position_ecst.launch
 We will use this data to launch the <strong>Perception/Manipulation</strong> pipeline (<em>shell#7</em>):
 
 ```bash
-roslaunch manipulation grasp_real.launch
+roslaunch manipulation grasp.launch
 ```
 
 Once the coke can is grasped and retreated, we can <strong>close shell #6 and # 5</strong>, then call our Navigation <strong>Service</strong> to go to the <strong>release_position</strong> pose (<em>shell#5</em>):
@@ -379,7 +379,7 @@ rosservice call /go_to_point "label: 'release_position'"
 Finally, we <strong>release</strong> the coke can inside the trash can (<em>shell#5</em>):
 
 ```bash
-roslaunch manipulation release_real.launch
+roslaunch manipulation release.launch
 ```
 
 <img src="https://github.com/ASME-ground-robot/2021-22/blob/main/doc/mission_v3.gif" width="600" />

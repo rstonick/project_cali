@@ -46,6 +46,14 @@ class GoToPOI(object):
         self.orientation2_w = rosparam.get_param(
             'release_position/orientation/w')
 
+        self.position3_x = rosparam.get_param('approach/position/x')
+        self.position3_y = rosparam.get_param('approach/position/y')
+        self.position3_z = rosparam.get_param('approach/position/z')
+        self.orientation3_x = rosparam.get_param('approach/orientation/x')
+        self.orientation3_y = rosparam.get_param('approach/orientation/y')
+        self.orientation3_z = rosparam.get_param('approach/orientation/z')
+        self.orientation3_w = rosparam.get_param('approach/orientation/w')
+
         self.rate = rospy.Rate(1)
         rospy.on_shutdown(self.shutdownhook)
         # # waits until the action server is up and running
@@ -82,6 +90,16 @@ class GoToPOI(object):
             goal.target_pose.pose.orientation.y = self.orientation2_y
             goal.target_pose.pose.orientation.z = self.orientation2_z
             goal.target_pose.pose.orientation.w = self.orientation2_w
+
+        elif request.label == 'approach':
+            goal.target_pose.header.frame_id = 'map'
+            goal.target_pose.pose.position.x = self.position3_x
+            goal.target_pose.pose.position.y = self.position3_y
+            goal.target_pose.pose.position.z = self.position3_z
+            goal.target_pose.pose.orientation.x = self.orientation3_x
+            goal.target_pose.pose.orientation.y = self.orientation3_y
+            goal.target_pose.pose.orientation.z = self.orientation3_z
+            goal.target_pose.pose.orientation.w = self.orientation3_w
 
         self.client.send_goal(goal, feedback_cb=self.feedback_callback)
 
