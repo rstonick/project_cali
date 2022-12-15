@@ -480,6 +480,8 @@ source devel/setup.bash
 roslaunch rover_autonav navigation_teb.launch 
  ```
 
+<img src="https://github.com/ASME-ground-robot/2021-22/blob/main/doc/an_real_gazebo.gif" width="600" />
+
 ## Operating the Robotic Arm
 
 Directories: 
