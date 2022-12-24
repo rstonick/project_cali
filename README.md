@@ -7,7 +7,6 @@ How to edit markdown files - https://www.markdownguide.org/cheat-sheet
  - [Installation instructions](#installation-instructions)
  - [System at a glance](#system-at-a-glance)
  - [Simulation](#simulation)
-   - [Making a Gazebo World](#making-a-gazebo-world)
    - [Autonomous Navigation](#autonomous-navigation)
    - [Manipulation Pipeline](#manipulation-pipeline)
    - [Perception Pipeline](#perception-pipeline)
@@ -17,7 +16,7 @@ How to edit markdown files - https://www.markdownguide.org/cheat-sheet
 
 
 # About
-Robot "Cali" is an open-source robotic platform for research and education. The robot is made of off-the-shelf components and integrates many open-source software packages. The robot has a embodided construct and a digital twin, allowing researchers and educators to develop and test their algorithms in both a simulated enviornment and the real world.  
+ <em>Cali</em> is an open-source robotic platform for research and education of mobile manipulators. The robot is made of off-the-shelf components and integrates many open-source software packages. This platform allows researchers and engineers to directly work on high-level tasks rather than to start everything from scratch to ease the development of mobile manipulators.  
 <img src="https://github.com/CSULA-URC/2021-22/blob/main/doc/Rover%202.JPG" width="600" />
 <img src="https://github.com/CSULA-URC/2021-22/blob/main/doc/rovergif1.gif" width="600" />
 <img src="https://github.com/CSULA-URC/2021-22/blob/main/doc/roboticarmgif3.gif" width="600" />
@@ -35,8 +34,14 @@ Contains Moveit configuration files
 ## perception
 Contains Perception Pipeline
 
+## arduino_codes
+Contains the control codes
+
+## docker_ros
+Contains the docker images related to this project
+
 # Installation instructions
-The software is based on ROS-Melodic on Ubuntu 18.04. 
+The software is based on ROS-Melodic on a Ubuntu 18.04 laptop. 
 
 Open up a terminal on your linux machine and execute following:
 ```bash
@@ -50,71 +55,27 @@ source devel/setup.bash
 
 
 # System at a glance
-- hardware - four wheel drive platform, one robot arm (scorbot-er3u)  
-- software - Ubuntu 18.04, ROS, and packages (Rviz, Gazebo, opencv, ...)  
-- computer - Jetson TX2
-- sensors - IMU, GPS, Lidar, Antenna, Transceiver, Camera, Encoders
+- Hardware: Customed four-wheeled skid-steer drive base + Robotic arm (<em>Sorbot-ER III</em>)  
+- Software: ROS Melodic, Ubuntu 18.04, Gazebo, Rviz, opencv ... 
+- Computer: Jetson TX2
+- Sensors: LiDAR, Camera, IMU, GPS, Wheel encoders, Battery-life sensor, LEDs
 
-The mechanical systems encompasses the chassis, suspension system, and drive system. The chassis consists of 1"x1" galvanized steel bolt together tubing for modularity. The suspension system consists of an independent radius arm setup with air shock absorbers for off road capabilities. The drive systems consists of 12V motors with 9" beach wheels for sandy and rocky terrain.
+<em>Cali</em> is composed of a customed 4-wheeled skid steer drive mobile platform and a commercial manipulator system: <em>Sorbot-ER III</em>. The arm is composed of 5 revolute joints plus a gripper that can open and close.
 
-The electrical systems encompasses power, sensing, controls, and communications. A 12V 50ah li-on battery is used to power all electronics on the rover with buck and boost converters for voltage differences. Sensing comprises of a 3-D camera, 2-D lidar, absolute encoders, an IMU, and a gps all used to sense and navigate its surroundings. The control system uses microcontrollers, microprocessors, and motor drivers to operate and drive the robot. The communication system uses an omni directional antenna connected through a network system via router for wireless teleoperation.
+A 2D LiDAR located near the arm base is used for navigation tasks. Additionally,
+a depth camera used for object detection is placed near the end effector which will move
+along its pitch orientation. The actuation system can be decomposed into two subsystems:
+the first one controls the wheeled platform and the second one controls the robot arm. All
+computations are handled with the Nvidia Jetson TX2 computer. The electronics
+compartment allows electronics to cool under hot weather and provide a dust-free
+environment for the components. The system contains a 12V 50Ah lithium battery to
+power all the electronic components of the robot. The communication system allows far
+range control of the robot up to 3.2km away from the base station.
 
+  <img src="https://github.com/ASME-ground-robot/2021-22/blob/main/doc/CAD_decomosition.png" width="600" />
 
 # Simulation
-  ## Making a Gazebo World
-  To launch an empty world in gazebo:
-   - open a terminal 
-   - type gazebo
-   - press the key enter, this will open the Gazebo application with an empty world environment 
-
-![Gazebo Instructions 1](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct1.jpg)
-  
-Next on the top left, access the edit category and select Building Editor
-  
-![Gazebo Instructions 2](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct2.jpg)
-  
-This should show below: 
  
-![Gazebo Instructions 3](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct3.jpg)
-
-NOTE: This tutorial assumes the user has a “blueprint” of the model. If not, then the user can customize to their needs as shown on the left.  
-
-Using a blueprint image of a map, the user can import it to show on the white square grid above. 
-Note that importing an image is only supported by the following formats: .jpg and .png
-
-![Gazebo Instructions 4](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct4.jpg)
-
-Once imported, a scale of the map is needed for proportional consistency of the real-world to the simulations. 
-
-![Gazebo Instructions 5](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct5.jpg)
-![Gazebo Instructions 6](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct6.jpg)
-
-Now, simply trace the obstacles on the white grid with the wall option. This represents the areas where laser scans would bounce to emit back data. 
-
-Once the map environment is traced with walls, the user has an option to decorate the barriers with color or visual textures such as a brick wall. 
-
-![Gazebo Instructions 7](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct7.jpg)
-![Gazebo Instructions 8](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct8.jpg)
-![Gazebo Instructions 9](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct9.jpg)
-![Gazebo Instructions 10](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct10.jpg)
-
-To save the model, access the file category on the top left and provide a name of choice including the directory
-
-Note: this only saves the environment as a model and not a world. So be careful to leave the pop up window as the model cannot be edited once exiting. 
-
-This saves the model in the building editor folder directory but can be customized to save in whichever folder desired
-
-![Gazebo Instructions 11](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct11.jpg)
-
-To include items such as a coke can, access the insert category and from the huge number of options, place items by dragging the option to the world environment. 
-
-![Gazebo Instructions 12](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct12.jpg)
-
-To save a world, access the file category and select save world as 
-save the end of your file as .world 
-
-![Gazebo Instructions 13](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct13.jpg)
-![Gazebo Instructions 14](https://github.com/CSULA-URC/2021-22/blob/main/doc/gazebo_instruct14.jpg)
 
 ## Autonomous Navigation
   [Add description]
@@ -262,7 +223,7 @@ rosrun manipulation pick_place_joint_cmds.py
 
 In order to perceive Cali's surroundings, an Intel Realsense d435 3D camera is used and placed on top of the last link of the arm. The data will then be used in ROS via a topic.
 
-Before launching the perception pipeline the camera needs to be <strong>correctly oriented</strong>.
+Before launching the perception pipeline the camera needs to be <strong>correctly aligned</strong>.
 Thus, we have created a perception pose in Moveit for that matter.
 
 Close all previous terminals, and open 3 new terminals (<em>shell#1, shell#2 and shell#3</em>):
@@ -313,7 +274,8 @@ We can see that it is now able to grasp the object using our <strong>Perception/
 
 
 
-## Mission Planner
+## Fecth-and-Carry Mission
+The goal of this mission is to perform a Fetch-and-Carry task in an indoor environment. It consists of picking a coke can from a room A and dump it into trash can located in room B.
 
 Close all previous shells:
 
@@ -324,47 +286,47 @@ cd ~/catkin_ws
 source devel/setup.bash
 roslaunch rover_autonav cali_ecst_lab.launch
 ```
-Launch <strong>Navigation</strong> node (<em>shell#2</em>):
 
-```bash
-roslaunch rover_autonav navigation_teb.launch
-```
-Launch Navigation <strong>Service Server</strong> where we can choose among different goal poses (<em>shell#3</em>):
-
-```bash
-roslaunch rover_autonav navigation_srv_server.launch
-```
-Call the <strong>Service</strong> to go to the <strong>approach</strong> pose (<em>shell#4</em>):
-
-```bash
-rosservice call /go_to_point "label: 'approach'"
-```
-
-Once arrived to the <strong>grasp_position</strong>, launch <strong>Moveit</strong> (<em>shell#4</em>):
+Launch <strong>Moveit</strong> (<em>shell#2</em>):
 
 ```bash
 roslaunch cali_project_moveit_config cali_planning_execution.launch
 ```
 
-Orient the camera towards the table surface (<em>shell#5</em>):
+Calibrate camera in order to be correcly aligned to perform obejct detection (<em>shell#3</em>):
 
 ```bash
-roslaunch manipulation perception.pose.launch
+roslaunch manipulation camera_alignment.launch
 ```
 
-Once, the camera is oriented, launch the <strong>Perception</strong> node (<em>shell#5</em>):
+Launch <strong>Navigation</strong> node (<em>shell#3</em>):
+
+```bash
+roslaunch rover_autonav navigation_teb.launch
+```
+Launch Navigation <strong>Service Server</strong> where we can choose among different goal poses (<em>shell#4</em>):
+
+```bash
+roslaunch rover_autonav navigation_srv_server.launch
+```
+Call the <strong>Service</strong> to go to towards the coke can (<em>shell#5</em>):
+
+```bash
+rosservice call /go_to_point "label: 'approach'"
+```
+Once <em>Cali</em> has arrived to its new position, he is now ready to perform the object detection pipeline(<em>shell#5</em>):
 
 ```bash
 roslaunch perception surface_detection.launch
 ```
 
-Then, when the <strong>surface_detection</strong> algorithm has detected both surface and object, we extract the position data from the robot to the object (<em>shell#6</em>):
+Then, when the <strong>surface_detection</strong> algorithm has detected both the surface and object, we extract the position data from the robot to the object (<em>shell#6</em>):
 
 ```bash
 roslaunch perception pub_object_position_ecst.launch
 ```
 
-We will use this data to launch the <strong>Perception/Manipulation</strong> pipeline (<em>shell#7</em>):
+<em>Cali</em> will now perform the Perception-based approach to get as close as possible to the graspable object and to start the Manipulation/Perception pipeline(<em>shell#7</em>):
 
 ```bash
 roslaunch manipulation grasp.launch
