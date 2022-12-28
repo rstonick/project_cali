@@ -78,7 +78,7 @@ range control of the robot up to 3.2km away from the base station.
  
 
 ## Autonomous Navigation
-  [Add description]
+
   ### 1) Mapping
   The first step is to create a <strong>map</strong> using the <em><strong>slam_gmapping</strong></em> package.
 
